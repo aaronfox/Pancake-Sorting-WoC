@@ -1,5 +1,5 @@
 # Pancake-Sorting-Wisdom-of-Crowds
-An attempt to solve the NP-Hard (and therefore NP-Complete) Pancake Sorting Problem using the Genetic Algorithms and Wisdom of Crowds
+An attempt to solve the NP-Complete Pancake Sorting Problem on Strings using Genetic Algorithms and the Wisdom of Crowds approach
 
 ### Wikipedia Page on the Pancake Sorting (Focus on the strings part):
 https://en.wikipedia.org/wiki/Pancake_sorting#The_pancake_problem_on_strings
