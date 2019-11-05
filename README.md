@@ -1,6 +1,11 @@
-# Tetris-Wisdom-of-Crowds
-An attempt to solve the NP-Complete Tetris Problem using the Genetic Algorithms and Wisdom of Crowds
+# Pancake-Sorting-Wisdom-of-Crowds
+An attempt to solve the NP-Hard (and therefore NP-Complete) Pancake Sorting Problem using the Genetic Algorithms and Wisdom of Crowds
 
+### Wikipedia Page on the Pancake Sorting (Focus on the strings part):
+https://en.wikipedia.org/wiki/Pancake_sorting#The_pancake_problem_on_strings
+
+
+#### Old Tetris Info; we are focusing on the Pancake Sorting Problem now:
 Reddit ELI5 regarding wy Tetris is NP-Complete: https://www.reddit.com/r/explainlikeimfive/comments/1ekvx7/eli5_what_is_a_npcomplete_problem_and_why_is/
 
 Website with a good problem representation: https://www.ryanheise.com/tetris/tetris_artificial_intelligence.html.
