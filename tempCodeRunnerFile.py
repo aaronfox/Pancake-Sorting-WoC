@@ -1,2 +1,2 @@
-chromosome) != self.indices_chromosome_size:
-            #     chromo
+
+# Reads in .string files made to be sorted using the pancake sorting algorithm

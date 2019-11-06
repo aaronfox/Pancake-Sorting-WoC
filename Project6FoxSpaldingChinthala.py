@@ -23,7 +23,9 @@ class genetic_pancake_algorithm:
         print("indices_chromosome_size == " + str(self.indices_chromosome_size))
 
         # Generate list of all possible indices that can be included in chromosome
-        self.all_possible_indices = list(range(0, len(self.original_unordered_string)))
+        # Exclude 0 because a flip of 0 would simply flip the first char in the string and would
+        # be pointless
+        self.all_possible_indices = list(range(1, len(self.original_unordered_string)))
 
 
         # Create number of initial chromosomes in population as specified by population_size
@@ -46,12 +48,17 @@ class genetic_pancake_algorithm:
 
 
     def evaluate_cost(self, chromosome):
-        return 0
         # First, apply all flips from indices to original string
         temp_string_array = self.original_unordered_string.copy()
 
+
+        print("Initially, temp_string_array == " + str(temp_string_array))
         for i in range(len(chromosome)):
-            temp_string_array = self.flip(temp_string_array.flip)
+            temp_string_array = self.flip_prefix(temp_string_array, chromosome[i])
+            # print("flipping at chromosome[i] == " + str(chromosome[i]) + " yields string of " + str(temp_string_array))
+
+        
+        print("After, temp_string_array == " + str(temp_string_array))
 
 
         # Then find number of subsequences in string and the length of those subsequences
@@ -62,9 +69,17 @@ class genetic_pancake_algorithm:
 
         # Find subsequences
 
-    # Flips string array from 0 to index (where 0 is) 
-    def flip(self, string, index):
+        return 0
 
+
+    # Flips string array from 0 to index (where 0 is) 
+    # INPUT: string: the string array to have a prefix flipped
+    #        index: the index for the prefix of the char array to be flipped
+    # OUTPUT: a new char array representing the string with its prefix flipped with the remaining unflipped postfix at the end
+    def flip_prefix(self, string, index):
+        prefix_string = string[:index + 1]
+        prefix_string.reverse()
+        return prefix_string + string[index + 1:] 
 
 
 
