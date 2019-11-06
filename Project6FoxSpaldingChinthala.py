@@ -4,7 +4,10 @@
 # Dr. Yampolskiy
 
 import math # Need math for math.ceil for indices size (ceil)
+import random # Needed for random.shuffle for indices
 
+# Chromosome is the indices of the pancakes that can be flipped
+# Each population contains population_size amount of the chromosomes
 class genetic_pancake_algorithm:
     def __init__(self, original_unordered_string, population_size):
         self.original_unordered_string = original_unordered_string
@@ -12,19 +15,30 @@ class genetic_pancake_algorithm:
         # self.
 
         # Max number of indices required is found by 18*n / 11 according to Chittri 
-        indices_chromosome_size = math.ceil(18 * len(self.original_unordered_string) / 11)
-        print("indices_chromosome_size == " + str(indices_chromosome_size))
-
-        # For initial population, place every possible index to flip for the first n, then fill remaining
-        # spots with any number within the bounds of indices
-
+        self.indices_chromosome_size = math.ceil(18 * len(self.original_unordered_string) / 11)
+        print("indices_chromosome_size == " + str(self.indices_chromosome_size))
 
         # Generate list of all possible indices that can be included in chromosome
         self.all_possible_indices = list(range(0, len(self.original_unordered_string)))
 
-        # Create number of initial populations as specified by population_size
+
+        # Create number of initial chromosomes in population as specified by population_size
         for i in range(population_size):
-            self.
+            # For each chromosome, place every possible index to flip for the first n, then fill remaining
+            # spots with any number within the bounds of indices
+
+            # Add all possible indices to flip for beginning n of 18n/11 indices
+            chromosome = random.sample(self.all_possible_indices, len(self.all_possible_indices))
+
+            # Add in remaining indices randomly until 18n/11 indices are in chromosome
+            while len(chromosome) != self.indices_chromosome_size:
+                chromosome.extend(random.sample(self.all_possible_indices, 1))
+
+            # Shuffle once more to ensure randomness
+            chromosome = random.sample(chromosome, len(chromosome))
+
+            print("chromosome == " + str(chromosome))
+
 
 
 # Reads in .string files made to be sorted using the pancake sorting algorithm
