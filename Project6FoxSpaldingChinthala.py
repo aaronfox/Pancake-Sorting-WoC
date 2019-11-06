@@ -67,7 +67,12 @@ class genetic_pancake_algorithm:
         # e.g. if we have 3 subsequences of length 4 and 5 subsequences of length 2,
         # the fitness of the function would 3(4) + 5(2) = 22
 
-        # Find subsequences
+        sorted_string = sorted(self.original_unordered_string)
+        print("sorted_string == " + str(sorted_string))
+
+        subarray_length_and_occurences = []
+        # Find subsequences by creating two for loops to find the number of subarrays (contiguous arrays)
+        self.find_sub_arrays(sorted_string, temp_string_array, chromosome)
 
         return 0
 
@@ -81,6 +86,99 @@ class genetic_pancake_algorithm:
         prefix_string.reverse()
         return prefix_string + string[index + 1:] 
 
+    def find_sub_arrays(self, ordered_string, chromosome_string, chromosome):
+        # Store each char with its corresponding "value" into dict. E.g. for ordered
+        # string of {'a', 'f', 'j'}, the dict would be {'a': 0, 'f': 1, 'j': 2}
+        string_with_value_dict = {}
+        # Value to store with each char
+        char_value = 0
+        # Assign each sorted char in ordered string array a value
+        for i in range(len(ordered_string)):
+            if ordered_string[i] not in string_with_value_dict:
+                string_with_value_dict[ordered_string[i]] = char_value
+                char_value = char_value + 1
+
+        print("string_with_value_dict == " + str(string_with_value_dict))
+        print("chromosome_string == " + str(chromosome_string))
+
+        # Create dictionary of subarray sizes and their number of occurences.
+        # E.g. for string_with_value_dict of {'a': 0, 'f': 1, 'j': 2, 'z': 3} and
+        # a chromosome_string of ['a', 'f', 'j', 'a', 'f', 'j', 'z', 'a', 'f', 'z', 'j', 'a', 'a'], the subarray_and_occurences_dict
+        # would be {2: 3, 3: 1, 4: 1}, because {'a', 'f'}, {'a', 'a'}, {'z', 'j'}, and {'z', 'j'} are three subarrays of length 2,
+        # {'a', 'f', 'j'} is one subarray of length 3, and {'a', 'f', 'j', 'z'} is one subarray of length 4
+        subarray_and_occurences_dict = {} 
+        
+        # TODO: REMOVE THIS it's for testing
+        string_with_value_dict = {'a': 0, 'f': 1, 'j': 2, 'z': 3}
+        chromosome_string = ['a', 'f', 'j', 'a', 'f', 'j', 'z', 'a', 'f', 'z', 'j', 'a', 'a']
+        # chromosome_string = ['a', 'f', 'j', 'a', 'f']# 'j', 'z', 'a', 'f', 'z', 'j', 'a', 'a']
+
+        print("\n\n=================\n\nNEW string_with_value_dict == " + str(string_with_value_dict))
+        print("NEW chromosome_string == " + str(chromosome_string))
+        # END TODO
+        index = 0
+        current_subarray_length = 1
+        # First while loop: just check for subarrays like ['a', 'f'] and ['a', 'a'] above (NOT for ['z', 'j'] yet)
+        while index != len(chromosome_string) - 1:
+            if string_with_value_dict[chromosome_string[index]] == string_with_value_dict[chromosome_string[index + 1]] or string_with_value_dict[chromosome_string[index]] + 1 == string_with_value_dict[chromosome_string[index + 1]]:
+                current_subarray_length = current_subarray_length + 1
+            else:
+                if current_subarray_length > 1:
+                    if current_subarray_length not in subarray_and_occurences_dict:
+                        subarray_and_occurences_dict[current_subarray_length] = 1
+                    else:
+                        subarray_and_occurences_dict[current_subarray_length] = subarray_and_occurences_dict[current_subarray_length] + 1
+
+                current_subarray_length = 1
+            index = index + 1
+        
+        # Account for if current subarray was at end
+        if current_subarray_length > 1:
+            if current_subarray_length not in subarray_and_occurences_dict:
+                subarray_and_occurences_dict[current_subarray_length] = 1
+            else:
+                subarray_and_occurences_dict[current_subarray_length] = subarray_and_occurences_dict[current_subarray_length] + 1
+
+        # Second while loop: just check for subarrays like ['z', 'j'] above (NOT for ['a', 'f'] and ['a', 'a'] yet)
+        index = len(chromosome_string) - 1
+        while index != 0:
+            print("chromosome_string[index] == " +
+                  str(chromosome_string[index]))
+            print("chromosome_string[index - 1] == " +
+                  str(chromosome_string[index - 1]))
+
+            print("string_with_value_dict[chromosome_string[index]] == " +
+                  str(string_with_value_dict[chromosome_string[index]]))
+            print("string_with_value_dict[chromosome_string[index - 1]] == " + str(
+                string_with_value_dict[chromosome_string[index - 1]]))
+
+            if string_with_value_dict[chromosome_string[index]] + 1 == string_with_value_dict[chromosome_string[index - 1]]:
+                current_subarray_length = current_subarray_length + 1
+                print("incrementing current_subarray_length to " +
+                      str(current_subarray_length))
+            else:
+                if current_subarray_length > 1:
+                    if current_subarray_length not in subarray_and_occurences_dict:
+                        subarray_and_occurences_dict[current_subarray_length] = 1
+                        print("!!!Updating subarray_and_occurences_dict to 1! " +
+                              str(subarray_and_occurences_dict))
+                    else:
+                        subarray_and_occurences_dict[current_subarray_length] = subarray_and_occurences_dict[current_subarray_length] + 1
+                        print("!!!Updating subarray_and_occurences_dict to more than one! " +
+                              str(subarray_and_occurences_dict))
+
+                current_subarray_length = 1
+            index = index - 1
+
+        # Account for if current subarray was at end
+        if current_subarray_length > 1:
+            if current_subarray_length not in subarray_and_occurences_dict:
+                subarray_and_occurences_dict[current_subarray_length] = 1
+            else:
+                subarray_and_occurences_dict[current_subarray_length] = subarray_and_occurences_dict[current_subarray_length] + 1
+
+        print("subarray_and_occurences_dict == " +
+              str(subarray_and_occurences_dict))
 
 
 # Reads in .string files made to be sorted using the pancake sorting algorithm
