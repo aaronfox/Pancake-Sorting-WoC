@@ -8,6 +8,10 @@ import random # Needed for random.shuffle for indices
 
 # Chromosome is the indices of the pancakes that can be flipped
 # Each population contains population_size amount of the chromosomes
+# INPUT:
+# original_unordered_string:
+# population_size:
+#
 class genetic_pancake_algorithm:
     def __init__(self, original_unordered_string, population_size):
         self.original_unordered_string = original_unordered_string
@@ -44,12 +48,23 @@ class genetic_pancake_algorithm:
     def evaluate_cost(self, chromosome):
         return 0
         # First, apply all flips from indices to original string
+        temp_string_array = self.original_unordered_string.copy()
+
+        for i in range(len(chromosome)):
+            temp_string_array = self.flip(temp_string_array.flip)
+
 
         # Then find number of subsequences in string and the length of those subsequences
         # and find the fitness of a function by multiplying the number of subsequences of a certain length
         # by that certain length and adding them all together.
         # e.g. if we have 3 subsequences of length 4 and 5 subsequences of length 2,
         # the fitness of the function would 3(4) + 5(2) = 22
+
+        # Find subsequences
+
+    # Flips string array from 0 to index (where 0 is) 
+    def flip(self, string, index):
+
 
 
 
