@@ -38,6 +38,18 @@ class genetic_pancake_algorithm:
             chromosome = random.sample(chromosome, len(chromosome))
 
             print("chromosome == " + str(chromosome))
+            print("cost of chromosome == " + str(self.evaluate_cost(chromosome)))
+
+
+    def evaluate_cost(self, chromosome):
+        return 0
+        # First, apply all flips from indices to original string
+
+        # Then find number of subsequences in string and the length of those subsequences
+        # and find the fitness of a function by multiplying the number of subsequences of a certain length
+        # by that certain length and adding them all together.
+        # e.g. if we have 3 subsequences of length 4 and 5 subsequences of length 2,
+        # the fitness of the function would 3(4) + 5(2) = 22
 
 
 
