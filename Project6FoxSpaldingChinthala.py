@@ -65,14 +65,10 @@ class genetic_pancake_algorithm:
                 # later selections of which city will be chosen for the crossover operators to perform on
                 self.roulette_wheel = self.get_roulette_wheel()
 
-                print("self.roulette_wheel == " + str(self.roulette_wheel))
-
-                 ### Crossover Operation ###
+                ### Crossover Operation ###
 
                 # Pick two parents for the crossover operator to occur
                 parent_one, parent_two = random.choices(population=self.current_population, weights=self.roulette_wheel, k=2)
-                print("parent_one == " + str(parent_one))
-                print("parent_two == " + str(parent_two))
 
                 # Check Crossover Probablity to make sure a crossover should occur
                 crossover_check = random.random()
@@ -87,7 +83,21 @@ class genetic_pancake_algorithm:
                     # Pick just one parent to copy exactly without any crossover operation
                     offspring = parent_one
 
+                # Check if mutation operator should be performed
+                mutation_check = random.random()
+
+                if mutation_check < mutation_probability:
+                    # Simply mutate the value of one index to become another index
+                    rand_index = random.choice(list(range(len(offspring))))
+
+                    # Remove currently indexed element from possible indices so that the element isn't set to the same char again
+                    possible_indices = self.all_possible_indices.copy()
+                    possible_indices.remove(offspring[rand_index])
+                    offspring[rand_index] = random.sample(possible_indices, 1)[0]
+
+
                 
+
 
     # Returns the "cost" of a chromosome by applying flips to the unordered string, finding the "fitness" of that string,
     # and then finding the inverse of that fitness as the cost
@@ -276,17 +286,11 @@ class genetic_pancake_algorithm:
 
         return roulette_wheel
 
-    # Using simple one point crossover
+    # Using simple one point crossover, and selecting the better of the two offspring to return
     # INPUT: parent_one: one chromosome selected by roulette selection
     #        parent_two: another chromosome selected by roulette selection
     def crossover_operator(self, parent_one, parent_two):
-        print("halp")
         index = random.sample(range(0, len(parent_one)), 1)[0]
-
-        print("index == " + str(index))
-
-        print("parent_one == " + str(parent_one))
-        print("parent_two == " + str(parent_two))
 
         # Initial offspring to potentially to return
         offspring_1 = parent_one[:index] + parent_two[index:]
