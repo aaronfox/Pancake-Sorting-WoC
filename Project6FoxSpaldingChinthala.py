@@ -47,13 +47,10 @@ class genetic_pancake_algorithm:
             # Place chromosome into population
             self.current_population.append(chromosome)
 
-            print("chromosome == " + str(chromosome))
-            print("cost of chromosome == " + str(self.evaluate_cost(chromosome)))
-        
-        print("self.current_population == " + str(self.current_population))
         # Append initial population (stored in current_population) into the generation_evaluations
         self.generation_evaluations.append(self.evaluate_generation(self.current_population))
 
+        # Keep track of which generation the program is currently on
         current_generation = 1
         # Step 4-10 here:
         while current_generation != number_of_generations:
@@ -104,9 +101,8 @@ class genetic_pancake_algorithm:
             self.generation_evaluations.append(self.evaluate_generation(self.new_population))
             self.current_population = self.new_population.copy()
 
-            # print("self.current_population == " + str(self.current_population))
-
         print("self.generation_evaluations == " + str(self.generation_evaluations))
+        print("self.generation_evaluations[len(self.generation_evaluations) - 1] == " + str(self.generation_evaluations[len(self.generation_evaluations) - 1]))
 
         print("final ordered string should be: " + str(sorted(self.original_unordered_string)))
         
@@ -319,7 +315,9 @@ class genetic_pancake_algorithm:
         offspring_2 = parent_two[:index] + parent_one[index:]
 
         # Return the better offspring that results from the one point crossover to help better results
-        offspring = offspring_1 if self.evaluate_cost(offspring_1) < self.evaluate_cost(offspring_2) else offspring_2
+        # TODO: Uncomment or remove the next line
+        # offspring = offspring_1 if self.evaluate_cost(offspring_1) < self.evaluate_cost(offspring_2) else offspring_2
+        offspring = offspring_1
 
         return offspring
 
@@ -373,14 +371,14 @@ def read_string(string_filepath):
 if __name__ == "__main__":
     print("Starting up Project6FoxSpaldingChinthala.py")
 
-    # string_array = read_string(r'string_10.string')
-    string_array = read_string(r'string_5.string')
+    string_array = read_string(r'string_15.string')
+    # string_array = read_string(r'string_5.string')
 
-    print("string_array == " + str(string_array))
+    print("string_array from input .string file == " + str(string_array))
 
     # mutation_probability should typically be in the range between 0.001 and 0.01
     # crossover_probability can be around 0.7 typically, but can vary depending on the problem
-    ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=10, number_of_generations=100, mutation_probability=.01, crossover_probability=0.7)
+    ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=25, number_of_generations=100, mutation_probability=.01, crossover_probability=0.8)
 
 
 
