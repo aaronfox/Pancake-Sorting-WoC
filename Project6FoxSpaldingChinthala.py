@@ -15,7 +15,8 @@ import random # Needed for random.shuffle for indices
 class genetic_pancake_algorithm:
     def __init__(self, original_unordered_string, population_size, number_of_generations, mutation_probability, crossover_probability):
         self.original_unordered_string = original_unordered_string
-        self.initial_population = []
+        # Initial population of (randomly generated) chromosomes is placed in current_population
+        self.current_population = []
         # self.
 
         # Max number of indices required is found by 18*n / 11 according to Chittri 
@@ -43,16 +44,55 @@ class genetic_pancake_algorithm:
             chromosome = random.sample(chromosome, len(chromosome))
 
             # Place chromosome into population
-            self.initial_population.append()
+            self.current_population.append(chromosome)
 
             print("chromosome == " + str(chromosome))
             print("cost of chromosome == " + str(self.evaluate_cost(chromosome)))
+        
+        print("self.current_population == " + str(self.current_population))
+
+        current_generation = 1
+        # Step 4-10 here:
+        while current_generation != number_of_generations:
+            if current_generation % 1000 == 0:
+                print('In generation ' + str(current_generation))
+            current_generation = current_generation + 1
+
+            self.new_population = []  # Holds newly created offspring
+            # Run while loop until length of new population equals the old population
+            while len(self.current_population) != len(self.new_population):
+                # self.roulette_wheel_index stores the fitness ratio of each tour in the population for
+                # later selections of which city will be chosen for the crossover operators to perform on
+                self.roulette_wheel = self.get_roulette_wheel()
+
+                print("self.roulette_wheel == " + str(self.roulette_wheel))
+
+                 ### Crossover Operation ###
+
+                # Pick two parents for the crossover operator to occur
+                parent_one, parent_two = random.choices(population=self.current_population, weights=self.roulette_wheel, k=2)
+                print("parent_one == " + str(parent_one))
+                print("parent_two == " + str(parent_two))
+
+                # Check Crossover Probablity to make sure a crossover should occur
+                crossover_check = random.random()
+
+                # Since random.random is between [0.0, 1.0), a crossover_probability of 1.0
+                # will always be a crossover as expected
+                if crossover_check < crossover_probability:
+                    # Crossover two parents to produce offspring
+                    offspring = self.crossover_operator(parent_one, parent_two)
+                # Else, skip crossover if the crossover probability variable is smaller than the random crossover_check 
+                else:
+                    # Pick just one parent to copy exactly without any crossover operation
+                    offspring = parent_one
+
+                
 
     # Returns the "cost" of a chromosome by applying flips to the unordered string, finding the "fitness" of that string,
     # and then finding the inverse of that fitness as the cost
     # INPUT: chromosome: the chromosome of indices to apply to the unordered string
     # OUTPUT: the float cost value, between (0.0, 1]
-
     def evaluate_cost(self, chromosome):
         # First, apply all flips from indices to copy of original string
         temp_string_array = self.original_unordered_string.copy()
@@ -187,7 +227,7 @@ class genetic_pancake_algorithm:
 
             index = index - 1
 
-        # TODO: Account for case where ['1', '1', '2', '1', '1'] i.e. where same letters are found at beginning/end of processed string
+        # Account for case where ['1', '1', '2', '1', '1'] i.e. where same letters are found at beginning/end of processed string
         # Account for if current subarray was at end
         if current_subarray_length > 1:
             if current_subarray_length_same_letter > 1:
@@ -204,6 +244,37 @@ class genetic_pancake_algorithm:
 
         return subarray_and_occurrences_dict
 
+    # Returns roulette wheel of the chromosome based on roulette wheel selection strategy for selecting chromosomes
+    # INPUT: none. Everything is covered in the class already using self.
+    # OUTPUT: list array of the resulting roulette wheel percentage, e.g. [0.454545, 0.363636, 0.181818] for a population with 3 chromosomes
+    def get_roulette_wheel(self):
+        roulette_wheel = []
+        # Append cost of chromsome to populations when done
+        for chromosome in self.current_population:
+            cost = self.evaluate_cost(chromosome)
+            roulette_wheel.append(cost)
+
+        # Find sum of costs for each chromosome in the population
+        costs_summed = sum(roulette_wheel)
+
+        # Divide the summed costs by the amount of each so that the "fitness"
+        # for the tour will be higher for a more fit chromosome than a less than fit chromosome
+        # (i.e. a chromosome with more and better subarrays will have a higher fitness)
+        for i in range(len(roulette_wheel)):
+            roulette_wheel[i] = costs_summed / roulette_wheel[i]
+
+        # Place ratio of the chromosome's fitness to the population's total fitness in roulette_wheel
+        costs_inverted_sum = sum(roulette_wheel)
+        for i in range(len(roulette_wheel)):
+            roulette_wheel[i] = roulette_wheel[i] / costs_inverted_sum
+
+        # For testing, make sure the sum is equal to 1.0 as expected
+        # self.sum = 0
+        # for i in range(len(roulette_wheel)):
+        #     self.sum = self.sum + roulette_wheel[i]
+
+
+        return roulette_wheel
 
 # Reads in .string files made to be sorted using the pancake sorting algorithm
 # INPUT: a filepath to the location of the string file
