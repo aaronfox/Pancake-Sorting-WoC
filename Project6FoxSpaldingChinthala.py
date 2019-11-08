@@ -104,17 +104,17 @@ class genetic_pancake_algorithm:
             self.generation_evaluations.append(self.evaluate_generation(self.new_population))
             self.current_population = self.new_population.copy()
 
-            print("self.current_population == " + str(self.current_population))
+            # print("self.current_population == " + str(self.current_population))
 
         print("self.generation_evaluations == " + str(self.generation_evaluations))
 
         print("final ordered string should be: " + str(sorted(self.original_unordered_string)))
         
-        # final_string = self.original_unordered_string.copy()
-        # for i in range(len(chromosome)):
-        #     final_string = self.flip_prefix(final_string, self.current_population[0])
+        final_string = self.original_unordered_string.copy()
+        for i in range(len(self.current_population[0])):
+            final_string = self.flip_prefix(final_string, self.current_population[0][i])
 
-        print("GA produced string is: " + str(sorted(self.original_unordered_string)))
+        print("GA produced string is: " + str(final_string))
 
 
 
