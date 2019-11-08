@@ -13,14 +13,13 @@ import random # Needed for random.shuffle for indices
 # population_size:
 #
 class genetic_pancake_algorithm:
-    def __init__(self, original_unordered_string, population_size):
+    def __init__(self, original_unordered_string, population_size, number_of_generations, mutation_probability, crossover_probability):
         self.original_unordered_string = original_unordered_string
         self.initial_population = []
         # self.
 
         # Max number of indices required is found by 18*n / 11 according to Chittri 
         self.indices_chromosome_size = math.ceil(18 * len(self.original_unordered_string) / 11)
-        print("indices_chromosome_size == " + str(self.indices_chromosome_size))
 
         # Generate list of all possible indices that can be included in chromosome
         # Exclude 0 because a flip of 0 would simply flip the first char in the string and would
@@ -43,32 +42,30 @@ class genetic_pancake_algorithm:
             # Shuffle once more to ensure randomness
             chromosome = random.sample(chromosome, len(chromosome))
 
+            # Place chromosome into population
+            self.initial_population.append()
+
             print("chromosome == " + str(chromosome))
             print("cost of chromosome == " + str(self.evaluate_cost(chromosome)))
 
+    # Returns the "cost" of a chromosome by applying flips to the unordered string, finding the "fitness" of that string,
+    # and then finding the inverse of that fitness as the cost
+    # INPUT: chromosome: the chromosome of indices to apply to the unordered string
+    # OUTPUT: the float cost value, between (0.0, 1]
 
     def evaluate_cost(self, chromosome):
-        # First, apply all flips from indices to original string
+        # First, apply all flips from indices to copy of original string
         temp_string_array = self.original_unordered_string.copy()
-
-
-        print("Initially, temp_string_array == " + str(temp_string_array))
         for i in range(len(chromosome)):
             temp_string_array = self.flip_prefix(temp_string_array, chromosome[i])
-            # print("flipping at chromosome[i] == " + str(chromosome[i]) + " yields string of " + str(temp_string_array))
 
         
-        print("After, temp_string_array == " + str(temp_string_array))
-
-
         # Then find number of subarrays in string and the length of those subarrays
         # and find the fitness of a function by multiplying the number of subarrays of a certain length
         # by that certain length and adding them all together.
         # e.g. if we have 3 subarrays of length 4 and 5 subsequences of length 2,
         # the fitness of the function would 3(4) + 5(2) = 22
-
         sorted_string = sorted(self.original_unordered_string)
-        print("sorted_string == " + str(sorted_string))
 
         # Find subsequences by creating two for loops to find the number of subarrays (contiguous arrays)
         subarray_length_and_occurrences = self.find_sub_arrays_length_and_occ(sorted_string, temp_string_array)
@@ -78,8 +75,11 @@ class genetic_pancake_algorithm:
         for length, occurrences in subarray_length_and_occurrences.items():
             fitness = fitness + length * occurrences
 
-        # Make cost just one over the fitness
-        cost = 1 / fitness
+        # Make cost just inverse of the fitness
+        if fitness == 0: # Make sure fitness isn't zero to avoid divide by zero exception
+            return 1
+        else:
+            cost = 1 / fitness
 
         return cost
 
@@ -109,9 +109,6 @@ class genetic_pancake_algorithm:
                 string_with_value_dict[ordered_string[i]] = char_value
                 char_value = char_value + 1
 
-        print("string_with_value_dict == " + str(string_with_value_dict))
-        print("chromosome_string == " + str(chromosome_string))
-
         # Create dictionary of subarray sizes and their number of occurrences.
         # E.g. for string_with_value_dict of {'a': 0, 'f': 1, 'j': 2, 'z': 3} and
         # a chromosome_string of ['a', 'f', 'j', 'a', 'f', 'j', 'z', 'a', 'f', 'z', 'j', 'a', 'a'], the subarray_and_occurrences_dict
@@ -133,9 +130,7 @@ class genetic_pancake_algorithm:
         # chromosome_string = ['1', '4', '2', '3', '2', '2', '2', '1']#, #, '2']#, '4', '4'] DONE: Make sure this works
         # chromosome_string = ['2', '2', '2', '1'] # DONE: Make sure this yields {3: 1, 4: 1}
 
-        print("\n\n=================\n\nNEW string_with_value_dict == " + str(string_with_value_dict))
-        print("NEW chromosome_string == " + str(chromosome_string))
-        # END TODO
+        # END testing TODO
         index = 0
         current_subarray_length = 1
         # First while loop: just check for subarrays like ['a', 'f'] and ['a', 'a'] above (NOT for ['z', 'j'] yet)
@@ -144,26 +139,20 @@ class genetic_pancake_algorithm:
                 current_subarray_length = current_subarray_length + 1
             else:
                 if current_subarray_length > 1:
-                    print("incrementing subarray of length " + str(current_subarray_length) + " in FIRST while loop")
-                    print("found end of forward/equal subarray at index == " + str(index))
-                    print("so from " + str(chromosome_string[index - current_subarray_length + 1:index + 1]))
                     if current_subarray_length not in subarray_and_occurrences_dict:
                         subarray_and_occurrences_dict[current_subarray_length] = 1
                     else:
                         subarray_and_occurrences_dict[current_subarray_length] = subarray_and_occurrences_dict[current_subarray_length] + 1
-                    print("subarray_and_occurrences_dict is now " + str(subarray_and_occurrences_dict))
 
                 current_subarray_length = 1
             index = index + 1
         
         # Account for if current subarray was at end
         if current_subarray_length > 1:
-            print("incrementing subarray of length " + str(current_subarray_length) + " in FIRST while after loop")
             if current_subarray_length not in subarray_and_occurrences_dict:
                 subarray_and_occurrences_dict[current_subarray_length] = 1
             else:
                 subarray_and_occurrences_dict[current_subarray_length] = subarray_and_occurrences_dict[current_subarray_length] + 1
-            print("subarray_and_occurrences_dict is now " + str(subarray_and_occurrences_dict))
 
         # Reset current_subarray_length for second while loop
         current_subarray_length = 1
@@ -176,8 +165,6 @@ class genetic_pancake_algorithm:
         while index != 0:
             if string_with_value_dict[chromosome_string[index]] + 1 == string_with_value_dict[chromosome_string[index - 1]]:
                 current_subarray_length = current_subarray_length + 1
-                # current_subarray_length_same_letter = 1
-                print("incrementing current_subarray_length to " + str(current_subarray_length))
             # Account for subarrays of same letters to add in with overall subarray, but don't add to main subarray length on its own like in first while
             # loop to avoid counting for double array twice
             elif string_with_value_dict[chromosome_string[index]] == string_with_value_dict[chromosome_string[index - 1]]:
@@ -185,24 +172,15 @@ class genetic_pancake_algorithm:
             else:
                 if current_subarray_length > 1:
                     if current_subarray_length_same_letter > 1:
-                        # note: print statements need fixing, but fine for now
-                        # print("SAME incrementing subarray of length " + str(current_subarray_length + current_subarray_length_same_letter - 1) + " in SECOND while loop1")
-                        # print("found at index == " + str(index))
-                        # print("so from " + str(chromosome_string[index:index + current_subarray_length_same_letter - 1]))
                         if current_subarray_length + current_subarray_length_same_letter - 1 not in subarray_and_occurrences_dict:
                             subarray_and_occurrences_dict[current_subarray_length + current_subarray_length_same_letter] = 1
                         else:
                             subarray_and_occurrences_dict[current_subarray_length + current_subarray_length_same_letter - 1] = subarray_and_occurrences_dict[current_subarray_length + current_subarray_length_same_letter - 1] + 1
                     else:
-                        # note: print statements need fixing, but fine for now
-                        # print("incrementing subarray of length " + str(current_subarray_length) + " in SECOND while loop11")
-                        # print("found end of backward subarray at index == " + str(index))
-                        # print("so from " + str(chromosome_string[index - current_subarray_length + 1 + 1:index + 1 + 1]))
                         if current_subarray_length not in subarray_and_occurrences_dict:
                             subarray_and_occurrences_dict[current_subarray_length] = 1
                         else:
                             subarray_and_occurrences_dict[current_subarray_length] = subarray_and_occurrences_dict[current_subarray_length] + 1
-                    print("subarray_and_occurrences_dict is now " + str(subarray_and_occurrences_dict))
 
                 current_subarray_length = 1
                 current_subarray_length_same_letter = 1
@@ -213,23 +191,16 @@ class genetic_pancake_algorithm:
         # Account for if current subarray was at end
         if current_subarray_length > 1:
             if current_subarray_length_same_letter > 1:
-                print("incrementing subarray of length " + str(current_subarray_length + current_subarray_length_same_letter) + " in SECOND while AFTER loop")
-                print("SAME incrementing subarray of length " + str(current_subarray_length + current_subarray_length_same_letter) + " in SECOND while loop")
                 if current_subarray_length + current_subarray_length_same_letter not in subarray_and_occurrences_dict:
                     subarray_and_occurrences_dict[current_subarray_length + current_subarray_length_same_letter] = 1
                 else:
                     subarray_and_occurrences_dict[current_subarray_length + current_subarray_length_same_letter] = subarray_and_occurrences_dict[current_subarray_length + current_subarray_length_same_letter] + 1
             else:
-                print("incrementing subarray of length " + str(current_subarray_length) + " in SECOND while AFTER loop")
                 if current_subarray_length not in subarray_and_occurrences_dict:
                     subarray_and_occurrences_dict[current_subarray_length] = 1
                 else:
                     subarray_and_occurrences_dict[current_subarray_length] = subarray_and_occurrences_dict[current_subarray_length] + 1
-                print("subarray_and_occurrences_dict is now " + str(subarray_and_occurrences_dict))
 
-
-        print("subarray_and_occurrences_dict == " +
-              str(subarray_and_occurrences_dict))
 
         return subarray_and_occurrences_dict
 
@@ -254,7 +225,7 @@ if __name__ == "__main__":
 
     print("string_array == " + str(string_array))
 
-    ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=1)
+    ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=3, number_of_generations=10, mutation_probability=1.0, crossover_probability=1.0)
 
 
 
