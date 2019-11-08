@@ -17,7 +17,8 @@ class genetic_pancake_algorithm:
         self.original_unordered_string = original_unordered_string
         # Initial population of (randomly generated) chromosomes is placed in current_population
         self.current_population = []
-        # self.
+        # Keep track of evaluations for each generation (each population of chromosomes)
+        self.generation_evaluations = []
 
         # Max number of indices required is found by 18*n / 11 according to Chittri 
         self.indices_chromosome_size = math.ceil(18 * len(self.original_unordered_string) / 11)
@@ -50,6 +51,8 @@ class genetic_pancake_algorithm:
             print("cost of chromosome == " + str(self.evaluate_cost(chromosome)))
         
         print("self.current_population == " + str(self.current_population))
+        # Append initial population (stored in current_population) into the generation_evaluations
+        self.generation_evaluations.append(self.evaluate_generation(self.current_population))
 
         current_generation = 1
         # Step 4-10 here:
@@ -61,7 +64,7 @@ class genetic_pancake_algorithm:
             self.new_population = []  # Holds newly created offspring
             # Run while loop until length of new population equals the old population
             while len(self.current_population) != len(self.new_population):
-                # self.roulette_wheel_index stores the fitness ratio of each tour in the population for
+                # self.roulette_wheel_index stores the fitness ratio of each chromosome in the population for
                 # later selections of which city will be chosen for the crossover operators to perform on
                 self.roulette_wheel = self.get_roulette_wheel()
 
@@ -97,9 +100,21 @@ class genetic_pancake_algorithm:
 
                 #  Once offspring has been created through possible crossover and possible mutation, add it to new population
                 self.new_population.append(offspring)
+            # 
+            self.generation_evaluations.append(self.evaluate_generation(self.new_population))
             self.current_population = self.new_population.copy()
 
             print("self.current_population == " + str(self.current_population))
+
+        print("self.generation_evaluations == " + str(self.generation_evaluations))
+
+        print("final ordered string should be: " + str(sorted(self.original_unordered_string)))
+        
+        # final_string = self.original_unordered_string.copy()
+        # for i in range(len(chromosome)):
+        #     final_string = self.flip_prefix(final_string, self.current_population[0])
+
+        print("GA produced string is: " + str(sorted(self.original_unordered_string)))
 
 
 
@@ -275,7 +290,7 @@ class genetic_pancake_algorithm:
         costs_summed = sum(roulette_wheel)
 
         # Divide the summed costs by the amount of each so that the "fitness"
-        # for the tour will be higher for a more fit chromosome than a less than fit chromosome
+        # for the chromosome will be higher for a more fit chromosome than a less than fit chromosome
         # (i.e. a chromosome with more and better subarrays will have a higher fitness)
         for i in range(len(roulette_wheel)):
             roulette_wheel[i] = costs_summed / roulette_wheel[i]
@@ -308,6 +323,41 @@ class genetic_pancake_algorithm:
 
         return offspring
 
+    # Takes in a given population of chromosomes and returns the average (cost) of traveling through every chromosome in the generation
+    # INPUT: A population of chromosomes, i.e. a generation 
+    # OUTPUT: Returns a list of [average_cost, worst_in_generation, best_in_generation, standard_deviation], where:
+    # average_cost is the average cost of every chromosome in the generation
+    # worst_in_generation is the worst costing chromosome of the generation
+    # best_in_generation is the best costing chromosome of the generation
+    # standard_deviation is the standard deviation of all the chromosomes in the generation
+    def evaluate_generation(self, population):
+        if len(population) < 1:
+            raise ValueError("Size of this generation's population is zero.")
+        population_costs = [] # Stores all population costs for use in standard deviation
+        total_cost = 0
+        worst_in_generation = -1 # Since chromosome's costs can never be negative, this is safe to start with
+        best_in_generation = float('inf') # Make worst cost of chromosome infinity large at first
+        for chromosome in population:
+            this_cost = self.evaluate_cost(chromosome)
+            population_costs.append(this_cost)
+            total_cost = total_cost + this_cost
+            if this_cost > worst_in_generation:
+                worst_in_generation = this_cost
+            if this_cost < best_in_generation:
+                best_in_generation = this_cost
+
+
+        # Calculate average
+        average_cost = total_cost / len(population)
+
+        # Calculate standard deviation of the generation
+        sum = 0
+        for i in range(len(population_costs)):
+            sum = sum + (population_costs[i] - average_cost) ** 2
+        standard_deviation = math.sqrt(sum / len(population_costs))
+
+        return [average_cost, worst_in_generation, best_in_generation, standard_deviation]
+
 # Reads in .string files made to be sorted using the pancake sorting algorithm
 # INPUT: a filepath to the location of the string file
 # OUTPUT: a char array of each letter of the strings
@@ -328,7 +378,9 @@ if __name__ == "__main__":
 
     print("string_array == " + str(string_array))
 
-    ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=3, number_of_generations=10, mutation_probability=1.0, crossover_probability=1.0)
+    # mutation_probability should typically be in the range between 0.001 and 0.01
+    # crossover_probability can be around 0.7 typically, but can vary depending on the problem
+    ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=10, number_of_generations=100, mutation_probability=.01, crossover_probability=0.7)
 
 
 
