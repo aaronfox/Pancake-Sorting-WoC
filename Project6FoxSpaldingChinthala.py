@@ -112,8 +112,12 @@ class genetic_pancake_algorithm:
         string_with_value_dict = {'a': 0, 'f': 1, 'j': 2, 'z': 3}
         # string_with_value_dict = {'1': 0, '2': 1, '3': 2, '4': 3}
         chromosome_string = ['a', 'f', 'j', 'a', 'f', 'j', 'z', 'a', 'f', 'z', 'j', 'a', 'a']
-        chromosome_string = ['a', 'f', 'j', 'f', 'a', 'a', 'f', 'a']# 'j', 'z', 'a', 'f', 'z', 'j', 'a', 'a']
+        # chromosome_string = ['a', 'f', 'j', 'f', 'a', 'a', 'f', 'a']# 'j', 'z', 'a', 'f', 'z', 'j', 'a', 'a'] {3: 1, 2: 2, 4:1}
         # chromosome_string = ['2', '1', '1', '1', '2', '2', '4', '4']
+        # chromosome_string = ['1', '2', '3', '2', '1', '1', '2', '1']
+        # chromosome_string = ['4', '2', '1', '1', '1', '2', '4', '2']#, '4', '4']
+        # chromosome_string = ['1', '4', '2', '3', '2', '2', '2', '1']#, #, '2']#, '4', '4'] DONE: Make sure this works
+        # chromosome_string = ['2', '2', '2', '1'] # DONE: Make sure this yields {3: 1, 4: 1}
 
         print("\n\n=================\n\nNEW string_with_value_dict == " + str(string_with_value_dict))
         print("NEW chromosome_string == " + str(chromosome_string))
@@ -126,82 +130,86 @@ class genetic_pancake_algorithm:
                 current_subarray_length = current_subarray_length + 1
             else:
                 if current_subarray_length > 1:
+                    print("incrementing subarray of length " + str(current_subarray_length) + " in FIRST while loop")
+                    print("found end of forward/equal subarray at index == " + str(index))
+                    print("so from " + str(chromosome_string[index - current_subarray_length + 1:index + 1]))
                     if current_subarray_length not in subarray_and_occurences_dict:
                         subarray_and_occurences_dict[current_subarray_length] = 1
                     else:
                         subarray_and_occurences_dict[current_subarray_length] = subarray_and_occurences_dict[current_subarray_length] + 1
+                    print("subarray_and_occurences_dict is now " + str(subarray_and_occurences_dict))
 
                 current_subarray_length = 1
             index = index + 1
         
         # Account for if current subarray was at end
         if current_subarray_length > 1:
+            print("incrementing subarray of length " + str(current_subarray_length) + " in FIRST while after loop")
             if current_subarray_length not in subarray_and_occurences_dict:
                 subarray_and_occurences_dict[current_subarray_length] = 1
-                print("!!!AT END Updating subarray_and_occurences_dict to one! " + str(subarray_and_occurences_dict))
             else:
                 subarray_and_occurences_dict[current_subarray_length] = subarray_and_occurences_dict[current_subarray_length] + 1
-                print("!!!AT END Updating subarray_and_occurences_dict to more than one! " + str(subarray_and_occurences_dict))
+            print("subarray_and_occurences_dict is now " + str(subarray_and_occurences_dict))
 
         # Reset current_subarray_length for second while loop
         current_subarray_length = 1
 
         # Check for same letter too to avoid counting it twice
         current_subarray_length_same_letter = 1
-        number_of_same_letters = 0
 
-        # Second while loop: just check for subarrays like ['z', 'j'] above (NOT for ['a', 'f'] and ['a', 'a'] yet)
+        # Second while loop: just check for subarrays like ['z', 'j'] = subarray of length 2 and ['z', 'j', 'j'] = subarray of length 3 above (NOT for ['a', 'f'] and ['a', 'a'] yet)
         index = len(chromosome_string) - 1
         while index != 0:
-            print("chromosome_string[index] == " +
-                  str(chromosome_string[index]))
-            print("chromosome_string[index - 1] == " +
-                  str(chromosome_string[index - 1]))
-
-            print("string_with_value_dict[chromosome_string[index]] == " +
-                  str(string_with_value_dict[chromosome_string[index]]))
-            print("string_with_value_dict[chromosome_string[index - 1]] == " + str(
-                string_with_value_dict[chromosome_string[index - 1]]))
-
             if string_with_value_dict[chromosome_string[index]] + 1 == string_with_value_dict[chromosome_string[index - 1]]:
                 current_subarray_length = current_subarray_length + 1
                 # current_subarray_length_same_letter = 1
                 print("incrementing current_subarray_length to " + str(current_subarray_length))
             # Account for subarrays of same letters to add in with overall subarray, but don't add to main subarray length on its own like in first while
             # loop to avoid counting for double array twice
-            if string_with_value_dict[chromosome_string[index]] == string_with_value_dict[chromosome_string[index - 1]]:
+            elif string_with_value_dict[chromosome_string[index]] == string_with_value_dict[chromosome_string[index - 1]]:
                 current_subarray_length_same_letter = current_subarray_length_same_letter + 1
-                print("incrementing SAME LETTER")
             else:
                 if current_subarray_length > 1:
                     if current_subarray_length_same_letter > 1:
-                        print("IN SAME LETTER LENGTH")
+                        print("SAME incrementing subarray of length " + str(current_subarray_length + current_subarray_length_same_letter - 1) + " in SECOND while loop1")
+                        print("found at index == " + str(index))
+                        print("so from " + str(chromosome_string[index - current_subarray_length - current_subarray_length_same_letter - 1:index]))
                         if current_subarray_length + current_subarray_length_same_letter - 1 not in subarray_and_occurences_dict:
                             subarray_and_occurences_dict[current_subarray_length + current_subarray_length_same_letter - 1] = 1
-                            print("!!!REVERSE Updating subarray_and_occurences_dict to 1! " + str(subarray_and_occurences_dict))
                         else:
-                            subarray_and_occurences_dict[current_subarray_length + current_subarray_length_same_letter - 1] = subarray_and_occurences_dict[current_subarray_length+ current_subarray_length_same_letter - 1] + 1
-                            print("!!!REVERSE Updating subarray_and_occurences_dict to more than one! " + str(subarray_and_occurences_dict))
+                            subarray_and_occurences_dict[current_subarray_length + current_subarray_length_same_letter - 1] = subarray_and_occurences_dict[current_subarray_length + current_subarray_length_same_letter - 1] + 1
                     else:
+                        print("incrementing subarray of length " + str(current_subarray_length) + " in SECOND while loop11")
+                        print("found end of backward subarray at index == " + str(index))
+                        print("so from " + str(chromosome_string[index - current_subarray_length + 1:index + 1]))
                         if current_subarray_length not in subarray_and_occurences_dict:
                             subarray_and_occurences_dict[current_subarray_length] = 1
                         else:
                             subarray_and_occurences_dict[current_subarray_length] = subarray_and_occurences_dict[current_subarray_length] + 1
+                    print("subarray_and_occurences_dict is now " + str(subarray_and_occurences_dict))
 
                 current_subarray_length = 1
                 current_subarray_length_same_letter = 1
 
             index = index - 1
 
+        # TODO: Account for case where ['1', '1', '2', '1', '1'] i.e. where same letters are found at beginning/end of processed string
         # Account for if current subarray was at end
         if current_subarray_length > 1:
-            if current_subarray_length not in subarray_and_occurences_dict:
-                subarray_and_occurences_dict[current_subarray_length] = 1
-                print("!!!AT END REVERSE Updating subarray_and_occurences_dict to one! " + str(subarray_and_occurences_dict))
-
+            if current_subarray_length_same_letter > 1:
+                print("incrementing subarray of length " + str(current_subarray_length + current_subarray_length_same_letter) + " in SECOND while AFTER loop")
+                print("SAME incrementing subarray of length " + str(current_subarray_length + current_subarray_length_same_letter) + " in SECOND while loop")
+                if current_subarray_length + current_subarray_length_same_letter not in subarray_and_occurences_dict:
+                    subarray_and_occurences_dict[current_subarray_length + current_subarray_length_same_letter] = 1
+                else:
+                    subarray_and_occurences_dict[current_subarray_length + current_subarray_length_same_letter] = subarray_and_occurences_dict[current_subarray_length + current_subarray_length_same_letter] + 1
             else:
-                subarray_and_occurences_dict[current_subarray_length] = subarray_and_occurences_dict[current_subarray_length] + 1
-                print("!!!AT END REVERSE Updating subarray_and_occurences_dict to more than one! " + str(subarray_and_occurences_dict))
+                print("incrementing subarray of length " + str(current_subarray_length) + " in SECOND while AFTER loop")
+                if current_subarray_length not in subarray_and_occurences_dict:
+                    subarray_and_occurences_dict[current_subarray_length] = 1
+                else:
+                    subarray_and_occurences_dict[current_subarray_length] = subarray_and_occurences_dict[current_subarray_length] + 1
+                print("subarray_and_occurences_dict is now " + str(subarray_and_occurences_dict))
 
 
         print("subarray_and_occurences_dict == " +
