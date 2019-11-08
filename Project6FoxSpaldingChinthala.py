@@ -95,6 +95,13 @@ class genetic_pancake_algorithm:
                     possible_indices.remove(offspring[rand_index])
                     offspring[rand_index] = random.sample(possible_indices, 1)[0]
 
+                #  Once offspring has been created through possible crossover and possible mutation, add it to new population
+                self.new_population.append(offspring)
+            self.current_population = self.new_population.copy()
+
+            print("self.current_population == " + str(self.current_population))
+
+
 
                 
 
