@@ -81,7 +81,7 @@ class genetic_pancake_algorithm:
                 # will always be a crossover as expected
                 if crossover_check < crossover_probability:
                     # Crossover two parents to produce offspring
-                    offspring = self.crossover_operator(parent_one, parent_two)
+                    offspring = self.crossover_operator(parent_one=parent_one, parent_two=parent_two)
                 # Else, skip crossover if the crossover probability variable is smaller than the random crossover_check 
                 else:
                     # Pick just one parent to copy exactly without any crossover operation
@@ -275,6 +275,27 @@ class genetic_pancake_algorithm:
 
 
         return roulette_wheel
+
+    # Using simple one point crossover
+    # INPUT: parent_one: one chromosome selected by roulette selection
+    #        parent_two: another chromosome selected by roulette selection
+    def crossover_operator(self, parent_one, parent_two):
+        print("halp")
+        index = random.sample(range(0, len(parent_one)), 1)[0]
+
+        print("index == " + str(index))
+
+        print("parent_one == " + str(parent_one))
+        print("parent_two == " + str(parent_two))
+
+        # Initial offspring to potentially to return
+        offspring_1 = parent_one[:index] + parent_two[index:]
+        offspring_2 = parent_two[:index] + parent_one[index:]
+
+        # Return the better offspring that results from the one point crossover to help better results
+        offspring = offspring_1 if self.evaluate_cost(offspring_1) < self.evaluate_cost(offspring_2) else offspring_2
+
+        return offspring
 
 # Reads in .string files made to be sorted using the pancake sorting algorithm
 # INPUT: a filepath to the location of the string file
