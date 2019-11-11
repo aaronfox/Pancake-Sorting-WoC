@@ -20,6 +20,11 @@ class genetic_pancake_algorithm:
         self.current_population = []
         # Keep track of evaluations for each generation (each population of chromosomes)
         self.generation_evaluations = []
+        # Keep track of the number of flips required to reach the string
+        self.number_of_flips = 0 
+        self.number_of_flips_to_solve = []
+
+        self.plot_deets = []
 
         # Max number of indices required is found by 18*n / 11 according to Chittri 
         self.indices_chromosome_size = math.ceil(18 * len(self.original_unordered_string) / 11)
@@ -114,17 +119,14 @@ class genetic_pancake_algorithm:
         print("GA produced string is: " + str(final_string))
 
         average_costs = [x for x, y, z, a in self.generation_evaluations]
+
+        self.plot_deets = [list(range(len(average_costs))), average_costs]
         
-        import matplotlib.pyplot as plt
-        plt.plot(list(range(len(average_costs))), average_costs)
-        plt.ylabel('Average Cost')
-        plt.xlabel('Generation')
-        plt.show()
-
-
-
-
-                
+        # import matplotlib.pyplot as plt
+        # plt.plot(list(range(len(average_costs))), average_costs)
+        # plt.ylabel('Average Cost')
+        # plt.xlabel('Generation')
+        # plt.show()
 
 
     # Returns the "cost" of a chromosome by applying flips to the unordered string, finding the "fitness" of that string,
@@ -134,7 +136,11 @@ class genetic_pancake_algorithm:
     def evaluate_cost(self, chromosome):
         # First, apply all flips from indices to copy of original string
         temp_string_array = self.original_unordered_string.copy()
+
         for i in range(len(chromosome)):
+            if temp_string_array == sorted(temp_string_array):
+                self.number_of_flips = i
+                self.number_of_flips_to_solve.append(i)
             temp_string_array = self.flip_prefix(temp_string_array, chromosome[i])
 
         
@@ -176,8 +182,8 @@ class genetic_pancake_algorithm:
         # print("distance_cost = " + str(distance_cost))
 
         # END TODO
-        subsequence_weight = 1.0
-        distance_weight = 1.0
+        subsequence_weight = 0.6
+        distance_weight = 0.9
 
         # Find greatest possible distance so that the cost can be put in a fraction over 1
         greatest_poss_distance = 0
@@ -317,6 +323,7 @@ class genetic_pancake_algorithm:
         roulette_wheel = []
         # Append cost of chromsome to populations when done
         for chromosome in self.current_population:
+            self.number_of_flips = 0
             cost = self.evaluate_cost(chromosome)
             roulette_wheel.append(cost)
 
@@ -409,11 +416,35 @@ def read_string(string_filepath):
 if __name__ == "__main__":
     print("Starting up Project6FoxSpaldingChinthala.py")
 
-    string_array = read_string(r'string_50.string')
-    # string_array = read_string(r'string_15.string')
+    # string_array = read_string(r'string_5.string')
+    string_array = read_string(r'string_10.string')
 
     print("string_array from input .string file == " + str(string_array))
 
     # mutation_probability should typically be in the range between 0.001 and 0.01
     # crossover_probability can be around 0.7 typically, but can vary depending on the problem
-    ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=50, number_of_generations=100, mutation_probability=.01, crossover_probability=0.8)
+    # ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=25, number_of_generations=5000, mutation_probability=.01, crossover_probability=0.8)
+    # print("ga.number_of_flips_to_solve == " + str(ga.number_of_flips_to_solve))
+
+    ### Wisdom of Crowds Approach ###
+
+    # Just take minimum number of each GA and 
+
+    import matplotlib.pyplot as plt
+
+    number_of_flips_to_solve_array = []
+    number_of_woc_iterations = 10
+    for i in range(number_of_woc_iterations):
+        ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=50, number_of_generations=3500, mutation_probability=.01, crossover_probability=0.8)
+        plt.plot(ga.plot_deets[0], ga.plot_deets[1])
+        number_of_flips_to_solve_array.append(ga.number_of_flips_to_solve)
+        print("For iteration " + str(i) + ", ga.number_of_flips_to_solve == " + str(ga.number_of_flips_to_solve))
+
+    print("number_of_flips_to_solve_array == " + str(number_of_flips_to_solve_array))
+
+    # import matplotlib.pyplot as plt
+    # plt.plot(list(range(len(average_costs))), average_costs)
+    plt.ylabel('Average Cost')
+    plt.xlabel('Generation')
+    plt.show()
+
