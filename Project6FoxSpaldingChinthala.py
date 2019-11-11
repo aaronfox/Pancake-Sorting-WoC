@@ -5,6 +5,7 @@
 
 import math # Need math for math.ceil for indices size (ceil)
 import random # Needed for random.shuffle for indices
+import sys # For exiting program when string is found
 
 # Chromosome is the indices of the pancakes that can be flipped
 # Each population contains population_size amount of the chromosomes
@@ -112,6 +113,15 @@ class genetic_pancake_algorithm:
 
         print("GA produced string is: " + str(final_string))
 
+        average_costs = [x for x, y, z, a in self.generation_evaluations]
+        
+        import matplotlib.pyplot as plt
+        plt.plot(list(range(len(average_costs))), average_costs)
+        plt.ylabel('Average Cost')
+        plt.xlabel('Generation')
+        plt.show()
+
+
 
 
                 
@@ -143,13 +153,41 @@ class genetic_pancake_algorithm:
         for length, occurrences in subarray_length_and_occurrences.items():
             fitness = fitness + length * occurrences
 
+        # TODO: Also consider order of letters in fitness
+
         # Make cost just inverse of the fitness
         if fitness == 0: # Make sure fitness isn't zero to avoid divide by zero exception
             return 1
         else:
             cost = 1 / fitness
 
-        return cost
+        # TODO: Try having cost just be the amount the letters are away from where they should be in the sorted string
+        distance_cost = 0
+        # temp_string_array = ['b', 'a', 'c', 'd', 'a']
+        # sorted_string = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+        for i in range(len(temp_string_array)):
+            # print("temp_string_array[i] == " + str(temp_string_array[i]))
+            # print("abs(sorted_string.index(temp_string_array[i])) == " + str(abs(sorted_string.index(temp_string_array[i]))))
+            distance_cost = distance_cost + abs(sorted_string.index(temp_string_array[i]) - i)
+
+        if distance_cost == 0:
+            print("temp_string_array == " + str(temp_string_array))
+            sys.exit("Found finished string!!!")
+        # print("distance_cost = " + str(distance_cost))
+
+        # END TODO
+        subsequence_weight = 1.0
+        distance_weight = 1.0
+
+        # Find greatest possible distance so that the cost can be put in a fraction over 1
+        greatest_poss_distance = 0
+        reverse_string = sorted_string[::-1]
+        for i in range(len(reverse_string)):
+            greatest_poss_distance = greatest_poss_distance + abs(sorted_string.index(reverse_string[i]) - i)
+        
+        distance_cost = distance_weight * (distance_cost / greatest_poss_distance)
+        subsequence_cost = subsequence_weight * cost
+        return subsequence_cost * distance_cost
 
 
     # Flips string array from 0 to index (where 0 is) 
@@ -371,20 +409,11 @@ def read_string(string_filepath):
 if __name__ == "__main__":
     print("Starting up Project6FoxSpaldingChinthala.py")
 
-    string_array = read_string(r'string_15.string')
-    # string_array = read_string(r'string_5.string')
+    string_array = read_string(r'string_50.string')
+    # string_array = read_string(r'string_15.string')
 
     print("string_array from input .string file == " + str(string_array))
 
     # mutation_probability should typically be in the range between 0.001 and 0.01
     # crossover_probability can be around 0.7 typically, but can vary depending on the problem
-    ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=25, number_of_generations=100, mutation_probability=.01, crossover_probability=0.8)
-
-
-
-
-
-
-
-
-
+    ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=50, number_of_generations=100, mutation_probability=.01, crossover_probability=0.8)
