@@ -12,9 +12,11 @@ indices_solutions = []
 # Chromosome is the indices of the pancakes that can be flipped
 # Each population contains population_size amount of the chromosomes
 # INPUT:
-# original_unordered_string:
-# population_size:
-#
+# original_unordered_string: the string array read from the .string file by read_string
+# population_size: the size of each feneration
+# number_of_generations: the number of generations to be run
+# mutation_probability: The probability of a mutation occurring, normally 0.01 or 0.001
+# crossover_probability: The probability of a crossover occurring, normally around 0.7
 class genetic_pancake_algorithm:
     def __init__(self, original_unordered_string, population_size, number_of_generations, mutation_probability, crossover_probability):
         self.original_unordered_string = original_unordered_string
@@ -165,15 +167,14 @@ class genetic_pancake_algorithm:
         for length, occurrences in subarray_length_and_occurrences.items():
             fitness = fitness + length * occurrences
 
-        # TODO: Also consider order of letters in fitness
-
         # Make cost just inverse of the fitness
         if fitness == 0: # Make sure fitness isn't zero to avoid divide by zero exception
             return 1
         else:
             cost = 1 / fitness
 
-        # TODO: Try having cost just be the amount the letters are away from where they should be in the sorted string
+        # Let the distance cost  be the amount the letters are away from where 
+        # they should be in the sorted string
         distance_cost = 0
         # temp_string_array = ['b', 'a', 'c', 'd', 'a']
         # sorted_string = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
@@ -188,7 +189,6 @@ class genetic_pancake_algorithm:
             self.found_sorted_string = True
         # print("distance_cost = " + str(distance_cost))
 
-        # END TODO
         subsequence_weight = 0.9
         distance_weight = 1.0
         extra_weight = 1
@@ -354,9 +354,6 @@ class genetic_pancake_algorithm:
         offspring_1 = parent_one[:index] + parent_two[index:]
         offspring_2 = parent_two[:index] + parent_one[index:]
 
-        # Return the better offspring that results from the one point crossover to help better results
-        # TODO: Uncomment or remove the next line
-        # offspring = offspring_1 if self.evaluate_cost(offspring_1) < self.evaluate_cost(offspring_2) else offspring_2
         offspring = offspring_1
 
         return offspring
@@ -412,7 +409,7 @@ if __name__ == "__main__":
     print("Starting up Project6FoxSpaldingChinthala.py")
 
     # string_array = read_string(r'string_5.string')
-    string_array = read_string(r'string_10.string')
+    string_array = read_string(r'string_15.string')
 
     print("string_array from input .string file == " + str(string_array))
 
@@ -428,9 +425,9 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     number_of_flips_to_solve_array = []
-    number_of_woc_iterations = 25
+    number_of_woc_iterations = 30
     for i in range(number_of_woc_iterations):
-        ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=50, number_of_generations=250, mutation_probability=.01, crossover_probability=0.8)
+        ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=50, number_of_generations=200, mutation_probability=.01, crossover_probability=0.8)
         plt.plot(ga.plot_deets[0], ga.plot_deets[1])
         number_of_flips_to_solve_array.append(ga.number_of_flips_to_solve)
         indices_solutions.append(ga.number_of_flips_to_solve)
@@ -452,4 +449,3 @@ if __name__ == "__main__":
     plt.ylabel('Average Cost')
     plt.xlabel('Generation')
     plt.show()
-
