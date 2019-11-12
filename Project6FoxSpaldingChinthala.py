@@ -7,6 +7,8 @@ import math # Need math for math.ceil for indices size (ceil)
 import random # Needed for random.shuffle for indices
 import sys # For exiting program when string is found
 
+indices_solutions = []
+
 # Chromosome is the indices of the pancakes that can be flipped
 # Each population contains population_size amount of the chromosomes
 # INPUT:
@@ -23,6 +25,9 @@ class genetic_pancake_algorithm:
         # Keep track of the number of flips required to reach the string
         self.number_of_flips = 0 
         self.number_of_flips_to_solve = []
+        self.successful_indices = []
+        # So the GA will stop running once the string has been found
+        self.found_sorted_string = False
 
         self.plot_deets = []
 
@@ -59,7 +64,7 @@ class genetic_pancake_algorithm:
         # Keep track of which generation the program is currently on
         current_generation = 1
         # Step 4-10 here:
-        while current_generation != number_of_generations:
+        while current_generation != number_of_generations and self.found_sorted_string == False:
             if current_generation % 1000 == 0:
                 print('In generation ' + str(current_generation))
             current_generation = current_generation + 1
@@ -141,6 +146,7 @@ class genetic_pancake_algorithm:
             if temp_string_array == sorted(temp_string_array):
                 self.number_of_flips = i
                 self.number_of_flips_to_solve.append(i)
+                self.successful_indices.append(chromosome[:i + 1])
             temp_string_array = self.flip_prefix(temp_string_array, chromosome[i])
 
         
@@ -178,12 +184,14 @@ class genetic_pancake_algorithm:
 
         if distance_cost == 0:
             print("temp_string_array == " + str(temp_string_array))
-            sys.exit("Found finished string!!!")
+            print("Found finished string!!!")
+            self.found_sorted_string = True
         # print("distance_cost = " + str(distance_cost))
 
         # END TODO
-        subsequence_weight = 0.6
-        distance_weight = 0.9
+        subsequence_weight = 0.9
+        distance_weight = 1.0
+        extra_weight = 1
 
         # Find greatest possible distance so that the cost can be put in a fraction over 1
         greatest_poss_distance = 0
@@ -191,8 +199,10 @@ class genetic_pancake_algorithm:
         for i in range(len(reverse_string)):
             greatest_poss_distance = greatest_poss_distance + abs(sorted_string.index(reverse_string[i]) - i)
         
-        distance_cost = distance_weight * (distance_cost / greatest_poss_distance)
-        subsequence_cost = subsequence_weight * cost
+        distance_cost = extra_weight * distance_weight * (distance_cost / greatest_poss_distance)
+        subsequence_cost = extra_weight * subsequence_weight * cost
+        if distance_cost * subsequence_cost == 0:
+            return 0.0000000000000000000001
         return subsequence_cost * distance_cost
 
 
@@ -228,21 +238,6 @@ class genetic_pancake_algorithm:
         # {'a', 'f', 'j'} is one subarray of length 3, and {'a', 'f', 'j', 'z'} is one subarray of length 4
         subarray_and_occurrences_dict = {} 
         
-        # TODO: REMOVE THIS it's for testing
-        # Chromosome String tests
-        # string_with_value_dict = {'a': 0, 'f': 1, 'j': 2, 'z': 3}
-        # string_with_value_dict = {'1': 0, '2': 1, '3': 2, '4': 3}
-        # chromosome_string = ['a', 'f', 'j', 'a', 'f', 'j', 'z', 'a', 'f', 'z', 'j', 'a', 'a']
-        # tests on 
-        # chromosome_string = ['z', 'j', 'a', 'a', 'f', 'j', 'z', 'z', 'j', 'f', 'a'] {6: 1, 5: 1, 2: 1}
-        # chromosome_string = ['a', 'f', 'j', 'f', 'a', 'a', 'f', 'a']# 'j', 'z', 'a', 'f', 'z', 'j', 'a', 'a'] {3: 1, 2: 2, 4:1}
-        # chromosome_string = ['2', '1', '1', '1', '2', '2', '4', '4']
-        # chromosome_string = ['1', '2', '3', '2', '1', '1', '2', '1']
-        # chromosome_string = ['4', '2', '1', '1', '1', '2', '4', '2']#, '4', '4']
-        # chromosome_string = ['1', '4', '2', '3', '2', '2', '2', '1']#, #, '2']#, '4', '4'] DONE: Make sure this works
-        # chromosome_string = ['2', '2', '2', '1'] # DONE: Make sure this yields {3: 1, 4: 1}
-
-        # END testing TODO
         index = 0
         current_subarray_length = 1
         # First while loop: just check for subarrays like ['a', 'f'] and ['a', 'a'] above (NOT for ['z', 'j'] yet)
@@ -433,17 +428,27 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     number_of_flips_to_solve_array = []
-    number_of_woc_iterations = 10
+    number_of_woc_iterations = 25
     for i in range(number_of_woc_iterations):
-        ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=50, number_of_generations=3500, mutation_probability=.01, crossover_probability=0.8)
+        ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=50, number_of_generations=250, mutation_probability=.01, crossover_probability=0.8)
         plt.plot(ga.plot_deets[0], ga.plot_deets[1])
         number_of_flips_to_solve_array.append(ga.number_of_flips_to_solve)
+        indices_solutions.append(ga.number_of_flips_to_solve)
         print("For iteration " + str(i) + ", ga.number_of_flips_to_solve == " + str(ga.number_of_flips_to_solve))
 
     print("number_of_flips_to_solve_array == " + str(number_of_flips_to_solve_array))
 
+    # minimum_number_of_flips is the final answer that the GA and WoC find
+    minimum_number_of_flips = float("inf")
+    for x in number_of_flips_to_solve_array:
+        if len(x) > 0:
+            if min(x) < minimum_number_of_flips:
+                minimum_number_of_flips = min(x)
     # import matplotlib.pyplot as plt
     # plt.plot(list(range(len(average_costs))), average_costs)
+    print("Minimum number of flips as determined by our GA and WoC: " + str(minimum_number_of_flips))
+    print("Keep in mind the maximum bound for this is 18 * n / 11, or " + str(math.ceil(18 * len(string_array) / 11)))
+    print("indices_solutions == " + str(indices_solutions))
     plt.ylabel('Average Cost')
     plt.xlabel('Generation')
     plt.show()
