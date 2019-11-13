@@ -425,9 +425,9 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     number_of_flips_to_solve_array = []
-    number_of_woc_iterations = 30
+    number_of_woc_iterations = 10
     for i in range(number_of_woc_iterations):
-        ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=50, number_of_generations=200, mutation_probability=.01, crossover_probability=0.8)
+        ga = genetic_pancake_algorithm(original_unordered_string=string_array, population_size=50, number_of_generations=150, mutation_probability=.01, crossover_probability=0.8)
         plt.plot(ga.plot_deets[0], ga.plot_deets[1])
         number_of_flips_to_solve_array.append(ga.number_of_flips_to_solve)
         indices_solutions.append(ga.number_of_flips_to_solve)
