@@ -80,11 +80,13 @@ void printArray(int arr[], int n)
 // Driver program to test above function 
 int main() 
 { 
-	int arr[] = {23, 10, 20, 11, 12, 6, 7, 3, 12, 16, 38, 51, 52, 66, 71, 72, 76, 79, 85, 56}; 
+	//int arr[] = {23, 10, 20, 11, 12, 6, 7, 3, 12, 16, 38, 51, 52, 66, 71, 72, 76, 79, 85, 56}; 
+        int arr[] = {99, 78, 72, 20, 36, 10, 17, 26, 57, 61, 29, 94, 77, 21, 60, 87, 27, 67, 76, 37, 51, 43, 49, 88, 14, 90, 91, 22, 85, 58, 16, 73, 97, 63, 75, 41, 11, 19, 69, 1, 79, 74, 56, 80, 4};
 	int n = sizeof(arr)/sizeof(arr[0]); 
 
 	pancakeSort(arr, n); 
-  printf("flips == %d", flips);
+  printf("flips == %d\n", flips);
+  printf("size of array == %d\n", sizeof(arr)/sizeof(*arr));
 
 	puts("Sorted Array "); 
 	printArray(arr, n); 
